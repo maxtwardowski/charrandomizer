@@ -12,6 +12,7 @@ import java.util.Random;
 public class charWriter {
 	
 	int numberOfChars;
+	long time_io, time_nio;
 	
 	public charWriter(int numberOfChars) {
 		this.numberOfChars = numberOfChars;
@@ -60,6 +61,22 @@ public class charWriter {
 		String fileContent = new String(Files.readAllBytes(Paths.get("randomchars.txt")));
 		System.out.println(fileContent);
 	}
+	
+	void DisplayResults() {
+		System.out.println("Running times:");
+		System.out.println("Java.io: " + time_io + " nanoseconds");
+		System.out.println("Java.nio: " + time_nio + " nanoseconds");
+	}
+	
+	void TimeCompare() {
+		if (time_io > time_nio) {
+			System.out.println("Java.nio was faster");
+		} else if (time_io < time_nio) {
+			System.out.println("Java.iio was faster");
+		} else if (time_io == time_nio) {
+			System.out.println(":)");
+		}
+	}
 
 	public static void main(String[] args) throws IOException {
 		
@@ -70,15 +87,16 @@ public class charWriter {
 		wat.WriteToFile_IO();
 		wat.ReadAndPrint_IO();
 		long estimatedTime = System.nanoTime() - startTime;
-		System.out.println("Java.io: " + estimatedTime + " nanoseconds");
+		wat.time_io = estimatedTime;
 		
 		startTime = System.nanoTime();
 		//using java.nio
 		wat.WriteToFile_NIO();
 		wat.ReadAndPrint_NIO();
 		estimatedTime = System.nanoTime() - startTime;
-		System.out.println("Java.nio: " + estimatedTime + " nanoseconds");
+		wat.time_nio = estimatedTime;
 		
+		wat.TimeCompare();
 	}
 
 }
