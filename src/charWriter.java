@@ -72,7 +72,7 @@ public class charWriter {
 		if (time_io > time_nio) {
 			System.out.println("Java.nio was faster");
 		} else if (time_io < time_nio) {
-			System.out.println("Java.iio was faster");
+			System.out.println("Java.io was faster");
 		} else if (time_io == time_nio) {
 			System.out.println(":)");
 		}
