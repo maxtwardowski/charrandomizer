@@ -1,8 +1,12 @@
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Random;
-import java.util.Scanner;
 
 
 public class charWriter {
@@ -19,30 +23,61 @@ public class charWriter {
 		return letter;
 	}
 	
-	void WriteToFile() throws FileNotFoundException {
-		PrintWriter writer = new PrintWriter("randomchars.txt");
+	String buildString() {
+		StringBuilder randomString = new StringBuilder();
 		for (int i = 0; i < numberOfChars; i++)
-			writer.println(RandomizeChar());
+			randomString.append(RandomizeChar());
+		return randomString.toString();
+	}
+	
+	void WriteToFile_IO() throws FileNotFoundException {
+		PrintWriter writer = new PrintWriter("randomchars.txt");
+		writer.println(buildString());
 		writer.close();
 	}
 	
-	void ReadAndPrint() throws FileNotFoundException {
-		Scanner scanner = new Scanner(new FileReader("randomchars.txt"));
-		StringBuilder builder = new StringBuilder();
-		while(scanner.hasNext()) {
-		    builder.append(scanner.next());
-		}
-		scanner.close();
-		
-		String readOut = builder.toString();
-		System.out.println(readOut);
+	void WriteToFile_NIO() throws IOException {
+		Path filePath = Paths.get("randomchars.txt");
+		Files.write(filePath, buildString().getBytes());
+	}
+	
+	void ReadAndPrint_IO() {
+		StringBuilder contentBuilder = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader("randomchars.txt"))) {
+ 
+            String sCurrentLine;
+            while ((sCurrentLine = br.readLine()) != null) {
+                contentBuilder.append(sCurrentLine).append("\n");
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println(contentBuilder.toString());;
+	}
+	
+	void ReadAndPrint_NIO() throws IOException {		
+		String fileContent = new String(Files.readAllBytes(Paths.get("randomchars.txt")));
+		System.out.println(fileContent);
 	}
 
-	public static void main(String[] args) throws FileNotFoundException {
+	public static void main(String[] args) throws IOException {
 		
 		charWriter wat = new charWriter(1000);
-		wat.WriteToFile();
-		wat.ReadAndPrint();
+		
+		long startTime = System.nanoTime();
+		//using java.io
+		wat.WriteToFile_IO();
+		wat.ReadAndPrint_IO();
+		long estimatedTime = System.nanoTime() - startTime;
+		System.out.println("Java.io: " + estimatedTime + " nanoseconds");
+		
+		startTime = System.nanoTime();
+		//using java.nio
+		wat.WriteToFile_NIO();
+		wat.ReadAndPrint_NIO();
+		estimatedTime = System.nanoTime() - startTime;
+		System.out.println("Java.nio: " + estimatedTime + " nanoseconds");
 		
 	}
 
